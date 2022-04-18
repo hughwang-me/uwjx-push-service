@@ -7,12 +7,14 @@ import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.push.model.v20160801.PushRequest;
 import com.aliyuncs.push.model.v20160801.PushResponse;
+import com.aliyuncs.utils.ParameterHelper;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Random;
 
 @Slf4j
@@ -38,7 +40,7 @@ public class AliyunPushService implements InitializingBean {
         request.setPushType("NOTICE");
         request.setDeviceType("ALL");
         request.setTarget("DEVICE");
-        request.setTargetValue("8d91cb85091e4915b0f3831618fb907e");
+        request.setTargetValue("f53f1131aec84b85a9a21eb5ef7cad7a");
 
         Random random = new Random();
         // 推送配置。
@@ -49,6 +51,23 @@ public class AliyunPushService implements InitializingBean {
         request.setAndroidOpenType("APPLICATION"); //点击通知后动作。APPLICATION：打开应用、ACTIVITY：打开AndroidActivity、URL：打开URL、NONE：无跳转。
         // 指定notificaitonchannel id。
         request.setAndroidNotificationChannel("uwjx-push-channel");
+
+        request.setPushType("NOTICE");
+// 额外参数
+        request.setAndroidExtParameters("{\"k1\":\"android\",\"k2\":\"v2\"}");
+// 设置辅助弹窗打开Activity，填写Activity类名，需包名+类名
+        request.setAndroidPopupActivity("com.uwjx.aliyun.push.PopupPushActivity.java");
+// 设置辅助弹窗通知标题
+        request.setAndroidPopupTitle("辅助弹窗标题" + random.nextInt(9527));
+// 设置辅助弹窗通知内容
+        request.setAndroidPopupBody("辅助弹窗内容" + random.nextInt(9527));
+// 72小时后消息失效, 不会再发送
+        String expireTime = ParameterHelper.getISO8601Time(new Date(System.currentTimeMillis() + 72 * 3600 * 1000));
+        request.setExpireTime(expireTime);
+// 离线消息是否保存,若保存, 在推送时候，用户即使不在线，下一次上线则会收到
+        request.setStoreOffline(true);
+//推送消息类型时，设置true，设备离线时会自动把消息转成辅助通道的通知
+        request.setAndroidRemind(true);
 
         try {
 

@@ -1,1 +1,4 @@
-
+aliyun:
+  appKey: XXXXXX
+  accessKeyId: XXXXX
+  accessSecret: XXXX
